@@ -17,7 +17,6 @@ class Preprocessor:
         Create engineered features from raw option data.
         """
         df = df.copy()
-
         df["moneyness"] = df["S"] / df["K"]
         df["log_moneyness"] = np.log(df["S"] / df["K"])
         df["sqrt_T"] = np.sqrt(df["T"])
@@ -32,19 +31,12 @@ class Preprocessor:
             "log_moneyness",
             "sqrt_T",
         ]
-
         return df[feature_columns]
 
     def fit_transform(self, df: pd.DataFrame):
-        """
-        Fit scaler and transform features (TRAINING ONLY).
-        """
         features = self.create_features(df)
         return self.scaler.fit_transform(features)
 
     def transform(self, df: pd.DataFrame):
-        """
-        Transform features using already-fitted scaler (INFERENCE).
-        """
         features = self.create_features(df)
         return self.scaler.transform(features)

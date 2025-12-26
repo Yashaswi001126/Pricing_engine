@@ -3,9 +3,10 @@ import joblib
 import pandas as pd
 from sklearn.linear_model import Ridge
 
-MODEL_DIR = os.path.join("ai", "model_store")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_DIR = os.path.join(BASE_DIR, "ai", "model_store")
 MODEL_PATH = os.path.join(MODEL_DIR, "vol_model.pkl")
-PREPROCESSOR_PATH = os.path.join(MODEL_DIR, "vol_preprocessor.pkl")
+DATA_PATH = os.path.join(BASE_DIR, "data", "options_data.csv")
 
 
 class AIVolatilityModel:
@@ -18,18 +19,42 @@ class AIVolatilityModel:
 
         self.model = Ridge(alpha=1.0)
         self.model.fit(X, y)
+        print("Volatility model trained!")
 
     def predict(self, ret, ret_sq):
+        if self.model is None:
+            raise ValueError("Volatility model not loaded or trained!")
         X = [[ret, ret_sq]]
         return float(self.model.predict(X)[0])
 
     def save(self):
         os.makedirs(MODEL_DIR, exist_ok=True)
         joblib.dump(self.model, MODEL_PATH)
+        print(f"Volatility model saved at {MODEL_PATH}")
 
     def load(self):
         if not os.path.exists(MODEL_PATH):
-            from ai.trainer import train_vol_model_auto
-            train_vol_model_auto()
+            print("Volatility model not found. Training now...")
+            self._train_vol_model_auto()
+            print("Training complete!")
 
         self.model = joblib.load(MODEL_PATH)
+        print(f"Volatility model loaded from {MODEL_PATH}")
+
+    def _train_vol_model_auto(self):
+        if not os.path.exists(DATA_PATH):
+         raise FileNotFoundError(f"Data file not found at {DATA_PATH}")
+ 
+        df = pd.read_csv(DATA_PATH)
+
+    # Compute returns based on underlying price S
+        df = df.sort_values(by="T")  # ensure time order if needed
+        df["returns"] = df["S"].pct_change().fillna(0)
+        df["returns_sq"] = df["returns"] ** 2
+    # future_vol: rolling std of returns as target
+        df["future_vol"] = df["returns"].rolling(window=3, min_periods=1).std().shift(-1).fillna(0)
+
+    # Train the model
+        self.train(df)
+        self.save()
+
