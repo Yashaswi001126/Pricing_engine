@@ -3,7 +3,6 @@ import pandas as pd
 from ai.price_model import AIPriceModel
 from ai.volatility_model import AIVolatilityModel
 
-# Absolute path for CSV
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, "data", "options_data.csv")
 
@@ -11,8 +10,6 @@ DATA_PATH = os.path.join(BASE_DIR, "data", "options_data.csv")
 def train_price_model_auto():
     print("🔁 Auto-training price model...")
     df = pd.read_csv(DATA_PATH)
-
-    # Price model uses only raw features, handled inside AIPriceModel
     model = AIPriceModel()
     model.train(df)
     model.save()
@@ -22,8 +19,6 @@ def train_price_model_auto():
 def train_vol_model_auto():
     print("🔁 Auto-training volatility model...")
     df = pd.read_csv(DATA_PATH)
-
-    # Auto-compute volatility features
     df = df.sort_values(by="T")
     df["returns"] = df["S"].pct_change().fillna(0)
     df["returns_sq"] = df["returns"] ** 2

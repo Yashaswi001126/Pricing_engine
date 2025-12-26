@@ -6,16 +6,12 @@ from sklearn.preprocessing import StandardScaler
 class Preprocessor:
     """
     Feature engineering + scaling for option pricing ML model.
-    The same instance must be used during training and inference.
     """
 
     def __init__(self):
         self.scaler = StandardScaler()
 
     def create_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Create engineered features from raw option data.
-        """
         df = df.copy()
         df["moneyness"] = df["S"] / df["K"]
         df["log_moneyness"] = np.log(df["S"] / df["K"])

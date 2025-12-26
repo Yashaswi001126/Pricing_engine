@@ -4,7 +4,6 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from ai.preprocessing import Preprocessor
 
-# Absolute paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_DIR = os.path.join(BASE_DIR, "ai", "model_store")
 MODEL_PATH = os.path.join(MODEL_DIR, "price_model.pkl")
@@ -37,13 +36,11 @@ class AIPriceModel:
         print(f"Price model saved at {MODEL_PATH}")
 
     def load(self):
+        # Auto-train if model missing
         if not os.path.exists(MODEL_PATH) or not os.path.exists(PREPROCESSOR_PATH):
             print("Price model or preprocessor not found, training now...")
             from ai.trainer import train_price_model_auto
             train_price_model_auto()
-
-        if not os.path.exists(MODEL_PATH) or not os.path.exists(PREPROCESSOR_PATH):
-            raise FileNotFoundError("Failed to train or save price model!")
 
         self.model = joblib.load(MODEL_PATH)
         self.preprocessor = joblib.load(PREPROCESSOR_PATH)

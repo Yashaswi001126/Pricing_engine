@@ -3,7 +3,6 @@ import joblib
 import pandas as pd
 from sklearn.linear_model import Ridge
 
-# Absolute paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_DIR = os.path.join(BASE_DIR, "ai", "model_store")
 MODEL_PATH = os.path.join(MODEL_DIR, "vol_model.pkl")
@@ -35,28 +34,9 @@ class AIVolatilityModel:
 
     def load(self):
         if not os.path.exists(MODEL_PATH):
-            print("Volatility model not found. Training now...")
-            self._train_vol_model_auto()
-            print("Training complete!")
-
-        if not os.path.exists(MODEL_PATH):
-            raise FileNotFoundError("Failed to train or save volatility model!")
+            print("Volatility model not found, training now...")
+            from ai.trainer import train_vol_model_auto
+            train_vol_model_auto()
 
         self.model = joblib.load(MODEL_PATH)
         print(f"Volatility model loaded from {MODEL_PATH}")
-
-    def _train_vol_model_auto(self):
-        if not os.path.exists(DATA_PATH):
-            raise FileNotFoundError(f"Data file not found at {DATA_PATH}")
-
-        df = pd.read_csv(DATA_PATH)
-
-        # Auto-compute features for volatility
-        df = df.sort_values(by="T")
-        df["returns"] = df["S"].pct_change().fillna(0)
-        df["returns_sq"] = df["returns"] ** 2
-        df["future_vol"] = df["returns"].rolling(window=3, min_periods=1).std().shift(-1).fillna(0)
-
-        # Train and save
-        self.train(df)
-        self.save()
