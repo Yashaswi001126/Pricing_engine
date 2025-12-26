@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 from sklearn.linear_model import Ridge
 
-# Absolute paths for Streamlit Cloud
+# Absolute paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_DIR = os.path.join(BASE_DIR, "ai", "model_store")
 MODEL_PATH = os.path.join(MODEL_DIR, "vol_model.pkl")
@@ -15,7 +15,6 @@ class AIVolatilityModel:
         self.model = None
 
     def train(self, df: pd.DataFrame):
-        # Use returns and squared returns as features
         X = df[["returns", "returns_sq"]]
         y = df["future_vol"]
 
@@ -40,6 +39,9 @@ class AIVolatilityModel:
             self._train_vol_model_auto()
             print("Training complete!")
 
+        if not os.path.exists(MODEL_PATH):
+            raise FileNotFoundError("Failed to train or save volatility model!")
+
         self.model = joblib.load(MODEL_PATH)
         print(f"Volatility model loaded from {MODEL_PATH}")
 
@@ -49,12 +51,12 @@ class AIVolatilityModel:
 
         df = pd.read_csv(DATA_PATH)
 
-        # Auto-compute returns and future volatility
-        df = df.sort_values(by="T")  # ensure proper time order
+        # Auto-compute features for volatility
+        df = df.sort_values(by="T")
         df["returns"] = df["S"].pct_change().fillna(0)
         df["returns_sq"] = df["returns"] ** 2
         df["future_vol"] = df["returns"].rolling(window=3, min_periods=1).std().shift(-1).fillna(0)
 
-        # Train and save model
+        # Train and save
         self.train(df)
         self.save()
