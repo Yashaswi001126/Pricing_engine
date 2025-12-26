@@ -1,0 +1,33 @@
+# --- Core Math & Financial Modeling ---
+numpy
+pandas
+scipy
+statsmodels
+
+# --- Machine Learning / AI ---
+scikit-learn
+joblib
+xgboost
+lightgbm
+
+# --- Deep Learning (optional, only if you want LSTM later) ---
+tensorflow
+
+# --- Data & Fetching ---
+yfinance
+
+# --- Visualization ---
+matplotlib
+seaborn
+plotly
+
+# --- UI / Dashboard ---
+streamlit
+
+# --- Notebooks ---
+jupyter
+notebook
+
+# --- Utilities ---
+python-dateutil
+
