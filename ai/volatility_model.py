@@ -8,7 +8,6 @@ MODEL_DIR = os.path.join(BASE_DIR, "ai", "model_store")
 MODEL_PATH = os.path.join(MODEL_DIR, "vol_model.pkl")
 DATA_PATH = os.path.join(BASE_DIR, "data", "options_data.csv")
 
-
 class AIVolatilityModel:
     def __init__(self):
         self.model = None
@@ -24,8 +23,7 @@ class AIVolatilityModel:
     def predict(self, ret, ret_sq):
         if self.model is None:
             raise ValueError("Volatility model not loaded or trained!")
-        X = [[ret, ret_sq]]
-        return float(self.model.predict(X)[0])
+        return float(self.model.predict([[ret, ret_sq]])[0])
 
     def save(self):
         os.makedirs(MODEL_DIR, exist_ok=True)
@@ -33,10 +31,12 @@ class AIVolatilityModel:
         print(f"Volatility model saved at {MODEL_PATH}")
 
     def load(self):
-        if not os.path.exists(MODEL_PATH):
-            print("Volatility model not found, training now...")
+        try:
+            self.model = joblib.load(MODEL_PATH)
+            print(f"Volatility model loaded from {MODEL_PATH}")
+        except:
+            print("Volatility model not found. Auto-training...")
             from ai.trainer import train_vol_model_auto
             train_vol_model_auto()
-
-        self.model = joblib.load(MODEL_PATH)
-        print(f"Volatility model loaded from {MODEL_PATH}")
+            self.model = joblib.load(MODEL_PATH)
+            print(f"Volatility model loaded after training from {MODEL_PATH}")

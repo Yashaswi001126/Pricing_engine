@@ -10,7 +10,6 @@ MODEL_PATH = os.path.join(MODEL_DIR, "price_model.pkl")
 PREPROCESSOR_PATH = os.path.join(MODEL_DIR, "price_preprocessor.pkl")
 DATA_PATH = os.path.join(BASE_DIR, "data", "options_data.csv")
 
-
 class AIPriceModel:
     def __init__(self):
         self.model = None
@@ -36,12 +35,14 @@ class AIPriceModel:
         print(f"Price model saved at {MODEL_PATH}")
 
     def load(self):
-        # Auto-train if model missing
-        if not os.path.exists(MODEL_PATH) or not os.path.exists(PREPROCESSOR_PATH):
-            print("Price model or preprocessor not found, training now...")
+        try:
+            self.model = joblib.load(MODEL_PATH)
+            self.preprocessor = joblib.load(PREPROCESSOR_PATH)
+            print(f"Price model loaded from {MODEL_PATH}")
+        except:
+            print("Price model not found. Auto-training...")
             from ai.trainer import train_price_model_auto
             train_price_model_auto()
-
-        self.model = joblib.load(MODEL_PATH)
-        self.preprocessor = joblib.load(PREPROCESSOR_PATH)
-        print(f"Price model loaded from {MODEL_PATH}")
+            self.model = joblib.load(MODEL_PATH)
+            self.preprocessor = joblib.load(PREPROCESSOR_PATH)
+            print(f"Price model loaded after training from {MODEL_PATH}")

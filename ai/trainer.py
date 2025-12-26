@@ -6,7 +6,6 @@ from ai.volatility_model import AIVolatilityModel
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, "data", "options_data.csv")
 
-
 def train_price_model_auto():
     print("🔁 Auto-training price model...")
     df = pd.read_csv(DATA_PATH)
@@ -15,7 +14,6 @@ def train_price_model_auto():
     model.save()
     print("✔ Price model trained and saved.")
 
-
 def train_vol_model_auto():
     print("🔁 Auto-training volatility model...")
     df = pd.read_csv(DATA_PATH)
@@ -23,12 +21,11 @@ def train_vol_model_auto():
     df["returns"] = df["S"].pct_change().fillna(0)
     df["returns_sq"] = df["returns"] ** 2
     df["future_vol"] = df["returns"].rolling(window=3, min_periods=1).std().shift(-1).fillna(0)
-
+    
     model = AIVolatilityModel()
     model.train(df)
     model.save()
     print("✔ Volatility model trained and saved.")
-
 
 class AIModelTrainer:
     def __init__(self):
@@ -39,7 +36,6 @@ class AIModelTrainer:
         self.price_model.load()
         self.vol_model.load()
         return self.price_model, self.vol_model
-
 
 if __name__ == "__main__":
     trainer = AIModelTrainer()
