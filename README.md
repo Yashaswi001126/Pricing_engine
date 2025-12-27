@@ -38,7 +38,12 @@ with AI-based volatility and price estimation, exposed via a Streamlit UI.
 
 ---
 
-##  Project Structure
+## Live Demo
+
+Check out the **AI-Powered Options Pricing & Forecasting Engine** deployed on Streamlit:
+
+[Open the App](https://pricingengine-ck2yv7wpokb8wdmr4owzhd.streamlit.app/)
+
 
 
 
